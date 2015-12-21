@@ -1,0 +1,7 @@
+nohup: ignoring input
+** Invoke ts:start (first_time)
+** Invoke environment (first_time)
+** Execute environment
+Connecting to database specified by database.yml
+** Execute ts:start
+Started searchd successfully (pid: 27096).

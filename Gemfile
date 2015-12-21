@@ -17,6 +17,7 @@ end
 
 gem 'sass-rails'
 gem 'compass-rails', '~> 1.1'
+gem 'therubyracer' 
 
 # Requiring 'compass' gem directly is not normally needed,
 # 'compass-rails' already does that.
@@ -49,10 +50,7 @@ gem 'thinking-sphinx', '~> 3.1.1'
 gem 'flying-sphinx', "~>1.2.0"
 # Use patched v2.0.2
 # Fixes issues: Create a new delayed delta job if there is an existing delta job which has failed
-gem 'ts-delayed-delta', "~>2.0.2",
-  :git    => 'git://github.com/pat/ts-delayed-delta.git',
-  :branch => 'master',
-  :ref    => '839284f2f28b3f4caf3a3bf5ccde9a6d222c7f4d'
+gem 'ts-delayed-delta', "~>2.0.2"
 gem 'possibly', '~> 0.2.0'
 
 # Can not use version 4.0.3, since it stucks the rails server loading. The issue which caused this
@@ -76,10 +74,7 @@ gem "truncate_html"
 gem 'money-rails'
 
 # The latest release (0.9.0) is not Rails 4 compatible
-gem 'mercury-rails',
-  git: 'git://github.com/jejacks0n/mercury.git',
-  branch: 'master',
-  ref: '1cc637b0bccea19085f824d2881c6513ed5ee8ae'
+gem 'mercury-rails'
 
 gem 'fb-channel-file'
 gem 'country_select', '~> 1.3.1'
@@ -88,10 +83,7 @@ gem "mail_view", "~> 1.0.3"
 gem 'statesman', '~> 0.5.0'
 gem "premailer"
 gem 'stringex', '~> 2.5.2'
-gem 'paypal-sdk-permissions',
-  :git    => 'git://github.com/paypal/permissions-sdk-ruby.git',
-  :branch => 'master',
-  :ref    => 'c0240bee9f94fe6338d67b4f754e1a11ce81619a'
+gem 'paypal-sdk-permissions'
 gem 'paypal-sdk-merchant', '~> 1.116.0'
 gem 'airbrake', '~>4.1.0'
 gem 'cache_digests'
@@ -155,3 +147,4 @@ group :development, :test do
 end
 
 gem 'strong_parameters'
+gem 'paypal-sdk-adaptivepayments'

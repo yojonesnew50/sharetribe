@@ -1,0 +1,24 @@
+nohup: ignoring input
+** Invoke jobs:work (first_time)
+** Invoke jobs:environment_options (first_time)
+** Invoke environment (first_time)
+** Execute environment
+Connecting to database specified by database.yml
+** Execute jobs:environment_options
+** Execute jobs:work
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] Starting job worker
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] Job CommunityJoinedJob (id=1) RUNNING
+{"tag":"delayed_job","free":"Running job","type":"running","structured":{"job_name":"CommunityJoinedJob","args":{"person_id":"aGWDBcPdOr5yaCbagqp0Ob","community_id":1}}}
+{"tag":"delayed_job","free":"Job success","type":"success","structured":{"job_name":"CommunityJoinedJob","args":{"person_id":"aGWDBcPdOr5yaCbagqp0Ob","community_id":1}}}
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] Job CommunityJoinedJob (id=1) COMPLETED after 0.6716
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] 1 jobs processed at 1.3597 j/s, 0 failed
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] Job CommunityJoinedJob (id=2) RUNNING
+{"tag":"delayed_job","free":"Running job","type":"running","structured":{"job_name":"CommunityJoinedJob","args":{"person_id":"bcMsZ-PdSr5yaabagqp0Ob","community_id":1}}}
+{"tag":"delayed_job","free":"Job success","type":"success","structured":{"job_name":"CommunityJoinedJob","args":{"person_id":"bcMsZ-PdSr5yaabagqp0Ob","community_id":1}}}
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] Job CommunityJoinedJob (id=2) COMPLETED after 0.0339
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] 1 jobs processed at 22.8592 j/s, 0 failed
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] Job CommunityJoinedJob (id=3) RUNNING
+{"tag":"delayed_job","free":"Running job","type":"running","structured":{"job_name":"CommunityJoinedJob","args":{"person_id":"a9Y5UyQbar5yaabagqp0Ob","community_id":1}}}
+{"tag":"delayed_job","free":"Job success","type":"success","structured":{"job_name":"CommunityJoinedJob","args":{"person_id":"a9Y5UyQbar5yaabagqp0Ob","community_id":1}}}
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] Job CommunityJoinedJob (id=3) COMPLETED after 0.3506
+[Worker(host:ubuntu-1gb-nyc3-01 pid:27036)] 1 jobs processed at 0.9394 j/s, 0 failed
