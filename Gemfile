@@ -148,3 +148,4 @@ end
 
 gem 'strong_parameters'
 gem 'paypal-sdk-adaptivepayments'
+gem 'capistrano'
