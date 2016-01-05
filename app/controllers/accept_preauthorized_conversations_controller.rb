@@ -13,43 +13,11 @@ class AcceptPreauthorizedConversationsController < ApplicationController
   skip_before_filter :verify_authenticity_token
 
   def accept
-    tx_id = params[:id]
-    tx = TransactionService::API::Api.transactions.query(tx_id)
-
-    if tx[:current_state] != :preauthorized
-      redirect_to person_transaction_path(person_id: @current_user.id, id: tx_id)
-      return
-    end
-
-    payment_type = tx[:payment_gateway]
-    case payment_type
-    when :braintree
-      render_braintree_form("accept")
-    when :paypal
-      render_paypal_form("accept")
-    else
-      raise ArgumentError.new("Unknown payment type: #{payment_type}")
-    end
+    render_paypal_custom_form("accept")
   end
 
   def reject
-    tx_id = params[:id]
-    tx = TransactionService::API::Api.transactions.query(tx_id)
-
-    if tx[:current_state] != :preauthorized
-      redirect_to person_transaction_path(person_id: @current_user.id, id: tx_id)
-      return
-    end
-
-    payment_type = tx[:payment_gateway]
-    case payment_type
-    when :braintree
-      render_braintree_form("reject")
-    when :paypal
-      render_paypal_form("reject")
-    else
-      raise ArgumentError.new("Unknown payment type: #{payment_type}")
-    end
+    render_paypal_custom_form("reject")
   end
 
   def accepted_or_rejected
@@ -164,6 +132,34 @@ class AcceptPreauthorizedConversationsController < ApplicationController
       preselected_action: preselected_action,
       paypal_fees_url: PaypalCountryHelper.fee_link(community_country_code)
     }
+  end
+
+  def render_paypal_custom_form(preselected_action)
+    total_sum = @listing_conversation.listing.price * @listing_conversation.listing_quantity
+    fee = total_sum * 0.1
+
+    result = TransactionService::Transaction.get(community_id: @current_community.id, transaction_id: @listing_conversation.id)
+    transaction = result[:data]
+
+    render action: :accept, locals: {
+      payment_gateway: :braintree,
+      listing: @listing,
+      booking: nil,
+      listing_quantity: transaction[:listing_quantity],
+      orderer: @listing_conversation.starter,
+      sum: total_sum,
+      fee: total_sum * 0.1,
+      shipping_price: nil,
+      shipping_address: nil,
+      seller_gets: total_sum - fee,
+      form: @listing_conversation,
+      form_action: acceptance_preauthorized_person_message_path(
+        person_id: @current_user.id,
+        id: @listing_conversation.id
+      ),
+      preselected_action: preselected_action
+    }
+    
   end
 
   def render_braintree_form(preselected_action)

@@ -80,8 +80,11 @@ module TransactionService::Transaction
   end
 
   def create(opts, paypal_async: false)
+
+    p " ==== inside create ===="
     opts_tx = opts[:transaction]
 
+    p " opts_tx ===== "
     set_adapter = settings_adapter(opts_tx[:payment_gateway])
     tx_process_settings = set_adapter.tx_process_settings(opts_tx)
 
@@ -94,9 +97,10 @@ module TransactionService::Transaction
                             gateway_adapter: gateway_adapter,
                             prefer_async: paypal_async)
 
-    res.maybe()
-      .map { |gw_fields| Result::Success.new(DataTypes.create_transaction_response(query(tx[:id]), gw_fields)) }
-      .or_else(res)
+    p " response === #{res} ==="
+
+    res.map { |gw_fields| Result::Success.new(DataTypes.create_transaction_response(query(tx[:id]), gw_fields)) }
+
   end
 
   def reject(community_id:, transaction_id:, message: nil, sender_id: nil)
@@ -113,15 +117,12 @@ module TransactionService::Transaction
 
 
   def complete_preauthorization(community_id:, transaction_id:, message: nil, sender_id: nil)
-    tx = TxStore.get_in_community(community_id: community_id, transaction_id: transaction_id)
+    transaction = query(transaction_id)
+    
+    PaypalService::Payments::Command.submit_to_settlement(transaction_id, community_id)
 
-    tx_process = tx_process(tx[:payment_process])
-    gw = gateway_adapter(tx[:payment_gateway])
-
-    res = tx_process.complete_preauthorization(tx: tx, message: message, sender_id: sender_id, gateway_adapter: gw)
-    res.maybe()
-      .map { |gw_fields| Result::Success.new(DataTypes.create_transaction_response(query(tx[:id]), gw_fields)) }
-      .or_else(res)
+    MarketplaceService::Transaction::Command.transition_to(transaction_id, :paid)
+    Result::Success.new(DataTypes.create_transaction_response(transaction))
   end
 
   def invoice

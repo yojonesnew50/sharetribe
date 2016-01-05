@@ -4,3 +4,21 @@
   = render :partial => "transactions/details", locals: {role: role, tx: transaction, transaction_model: transaction_model, listing: listing, is_author: is_author, price_break_down_locals: price_break_down_locals}
 
   = render :partial => "conversations/messages_and_form", locals: {role: role, message_form: message_form, message_form_action: message_form_action, messages: messages}
+
+  - if params[:payment_type] == "paypal" && transaction_model.paypal_initiated != true
+    %script{:src => "https://www.paypalobjects.com/js/external/dg.js", :type => "text/javascript"}
+
+    %form.standard{:action => "https://www.sandbox.paypal.com/webapps/adaptivepayment/flow/pay", :target => "PPDGFrame", :id => "paypalForm"}
+      %input#type{:name => "expType", :type => "hidden", :value => "light"}/
+      %input#paykey{:name => "paykey", :type => "hidden", :value => "#{params[:paypal_key]}"}/
+      %input{type:"hidden", name: "custom", value: "#{params[:paypal_key]}" }
+      %input#submitBtn{:src => "https://www.paypalobjects.com/en_US/i/btn/btn_paynowCC_LG.gif", :type => "image", :value => "Pay with PayPal", :style => "display:none"}/
+
+    %form{:action => "/transactions/#{transaction_model.id}/paypal_initiated", id: "paypalInitiated", "data-remote" => "true"}
+      %input{:name => "initiated", :type => "hidden", :value => "true"}/
+
+    - content_for :extra_javascript do
+      :javascript
+        var embeddedPPFlow = new PAYPAL.apps.DGFlow({trigger: 'submitBtn'});
+        $("#submitBtn").trigger("click");
+        $("#paypalInitiated").submit();

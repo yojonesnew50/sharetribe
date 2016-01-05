@@ -6,6 +6,7 @@ default: &default_settings
   # NOTE: Do not include http(s) here, or subdomains, just the top level domain, like "sharetribe.com" for example
 
   domain: "warmshopping.com"
+  ssl_cert_file: "/Users/mike/GitHub/sharetribe/config/cacert.pem"
 
   # If you want to make logins work across different subdomains you should put here the domain where you are running Sharetribe.
   # practically in most cases the same value as in "domain:"

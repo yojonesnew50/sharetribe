@@ -147,5 +147,7 @@ group :development, :test do
 end
 
 gem 'strong_parameters'
+
 gem 'paypal-sdk-adaptivepayments'
 gem 'capistrano'
+gem 'thin'

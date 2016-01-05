@@ -279,7 +279,13 @@ class PreauthorizeTransactionsController < ApplicationController
   def preauthorize
     quantity = TransactionViewUtils.parse_quantity(params[:quantity])
     vprms = view_params(listing_id: params[:listing_id], quantity: quantity)
-    braintree_settings = BraintreePaymentQuery.braintree_settings(@current_community.id)
+    listing = Listing.find(params[:listing_id])
+    seller = listing.author
+
+    paypal_gateway = PaypalGateway.new
+    @payKey = paypal_gateway.pay(vprms[:total_price], seller.paypal_account)
+
+    #braintree_settings = BraintreePaymentQuery.braintree_settings(@current_community.id)
 
     price_break_down_locals = TransactionViewUtils.price_break_down_locals({
       booking:  false,
@@ -293,8 +299,8 @@ class PreauthorizeTransactionsController < ApplicationController
 
     render "listing_conversations/preauthorize", locals: {
       preauthorize_form: PreauthorizeMessageForm.new,
-      braintree_client_side_encryption_key: braintree_settings[:braintree_client_side_encryption_key],
-      braintree_form: BraintreeForm.new,
+      #braintree_client_side_encryption_key: braintree_settings[:braintree_client_side_encryption_key],
+      #braintree_form: BraintreeForm.new,
       listing: vprms[:listing],
       quantity: quantity,
       author: query_person_entity(vprms[:listing][:author_id]),
@@ -306,51 +312,28 @@ class PreauthorizeTransactionsController < ApplicationController
   end
 
   def preauthorized
-    conversation_params = params[:listing_conversation]
 
-    if @current_community.transaction_agreement_in_use? && conversation_params[:contract_agreed] != "1"
-      flash[:error] = t("error_messages.transaction_agreement.required_error")
-      return redirect_to action: :preauthorize
-    end
+    transaction_response = create_preauth_transaction(
+      paypal_paykey: params[:paypal_key],
+      community: @current_community,
+      listing: @listing,
+      user: @current_user,
+      listing_quantity: 1,
+      use_async: request.xhr?,
+      shipping_price: @listing.shipping_price
+      )
 
-    preauthorize_form = PreauthorizeMessageForm.new(conversation_params.merge({
-      listing_id: @listing.id
-    }))
+    p " transaction response == #{transaction_response[0].data[:transaction][:id]}" 
 
-    if preauthorize_form.valid?
-      braintree_form = BraintreeForm.new(params[:braintree_payment])
-      quantity = TransactionViewUtils.parse_quantity(preauthorize_form.quantity)
 
-      transaction_response = TransactionService::Transaction.create({
-          transaction: {
-            community_id: @current_community.id,
-            listing_id: @listing.id,
-            listing_title: @listing.title,
-            starter_id: @current_user.id,
-            listing_author_id: @listing.author.id,
-            unit_type: @listing.unit_type,
-            unit_price: @listing.price,
-            unit_tr_key: @listing.unit_tr_key,
-            listing_quantity: quantity,
-            content: preauthorize_form.content,
-            payment_gateway: :braintree,
-            payment_process: :preauthorize,
-          },
-          gateway_fields: braintree_form.to_hash
-        })
+    transaction_id = transaction_response[0].data[:transaction][:id]
 
-      unless transaction_response[:success]
-        flash[:error] = "An error occured while trying to create a new transaction: #{transaction_response[:error_msg]}"
-        return redirect_to action: :preauthorize
-      end
+    MarketplaceService::Transaction::Command.transition_to(transaction_id, "initiated")
+    transaction = Transaction.find(transaction_id)
 
-      transaction_id = transaction_response[:data][:transaction][:id]
-
-      redirect_to person_transaction_path(:person_id => @current_user.id, :id => transaction_id)
-    else
-      flash[:error] = preauthorize_form.errors.full_messages.join(", ")
-      return redirect_to action: :preauthorize
-    end
+    transaction.update_attributes(paypal_paykey: params[:paypal_key])
+    
+    return redirect_to person_transaction_path(:person_id => @current_user.id, :id => transaction_id, payment_type: params[:payment_type], paypal_key: params[:paypal_key])
   end
 
   private
@@ -377,7 +360,7 @@ class PreauthorizeTransactionsController < ApplicationController
 
     action_button_label = translate(listing[:action_button_tr_key])
 
-    subtotal = listing[:price] * quantity
+    subtotal = listing[:price] * 1
     shipping_price = shipping_price_total(listing[:shipping_price], listing[:shipping_price_additional], quantity)
     total_price = shipping_enabled ? subtotal + shipping_price : subtotal
 
@@ -481,23 +464,6 @@ class PreauthorizeTransactionsController < ApplicationController
   end
 
   def create_preauth_transaction(opts)
-    gateway_fields =
-      if (opts[:payment_type] == :paypal)
-        # PayPal doesn't like images with cache buster in the URL
-        logo_url = Maybe(opts[:community])
-          .wide_logo
-          .select { |wl| wl.present? }
-          .url(:paypal, timestamp: false)
-          .or_else(nil)
-
-        {
-          merchant_brand_logo_url: logo_url,
-          success_url: success_paypal_service_checkout_orders_url,
-          cancel_url: cancel_paypal_service_checkout_orders_url(listing_id: opts[:listing].id)
-        }
-      else
-        BraintreeForm.new(opts[:bt_payment_params]).to_hash
-      end
 
     transaction = {
           community_id: opts[:community].id,
@@ -510,22 +476,20 @@ class PreauthorizeTransactionsController < ApplicationController
           unit_price: opts[:listing].price,
           unit_tr_key: opts[:listing].unit_tr_key,
           unit_selector_tr_key: opts[:listing].unit_selector_tr_key,
-          content: opts[:content],
-          payment_gateway: opts[:payment_type],
-          payment_process: :preauthorize,
-          booking_fields: opts[:booking_fields],
-          delivery_method: opts[:delivery_method]
+          payment_gateway: :none,
+          payment_process: :preauthorize
+
     }
+    p "sharetribe transaction #{transaction}"
 
     if(opts[:delivery_method] == :shipping)
       transaction[:shipping_price] = opts[:shipping_price]
     end
 
     TransactionService::Transaction.create({
-        transaction: transaction,
-        gateway_fields: gateway_fields
-      },
-      paypal_async: opts[:use_async])
+        transaction: transaction
+      })
+
   end
 
   def query_person_entity(id)

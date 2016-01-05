@@ -41,8 +41,8 @@ module TransactionService::DataTypes::Transaction
 
   def create_transaction_response(transaction, gateway_fields = {})
     TransactionResponse.call({
-        transaction: transaction,
-        gateway_fields: gateway_fields
+        transaction: transaction
+
       })
   end
 end

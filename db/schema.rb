@@ -11,7 +11,7 @@
 #
 # It's strongly recommended to check this file into your version control system.
 
-ActiveRecord::Schema.define(:version => 20151215071150) do
+ActiveRecord::Schema.define(:version => 20160105193531) do
 
   create_table "auth_tokens", :force => true do |t|
     t.string   "token"
@@ -131,16 +131,16 @@ ActiveRecord::Schema.define(:version => 20151215071150) do
     t.datetime "updated_at"
     t.text     "settings"
     t.string   "consent"
-    t.boolean  "transaction_agreement_in_use",                                   :default => false
-    t.boolean  "email_admins_about_new_members",                                 :default => false
-    t.boolean  "use_fb_like",                                                    :default => false
-    t.boolean  "real_name_required",                                             :default => true
-    t.boolean  "feedback_to_admin",                                              :default => true
-    t.boolean  "automatic_newsletters",                                          :default => true
-    t.boolean  "join_with_invite_only",                                          :default => false
+    t.boolean  "transaction_agreement_in_use",                             :default => false
+    t.boolean  "email_admins_about_new_members",                           :default => false
+    t.boolean  "use_fb_like",                                              :default => false
+    t.boolean  "real_name_required",                                       :default => true
+    t.boolean  "feedback_to_admin",                                        :default => true
+    t.boolean  "automatic_newsletters",                                    :default => true
+    t.boolean  "join_with_invite_only",                                    :default => false
     t.text     "allowed_emails"
-    t.boolean  "users_can_invite_new_users",                                     :default => true
-    t.boolean  "private",                                                        :default => false
+    t.boolean  "users_can_invite_new_users",                               :default => true
+    t.boolean  "private",                                                  :default => false
     t.string   "label"
     t.boolean  "show_date_in_listings_list",                               :default => false
     t.boolean  "all_users_can_add_news",                                   :default => true
@@ -219,6 +219,14 @@ ActiveRecord::Schema.define(:version => 20151215071150) do
   add_index "communities", ["domain"], :name => "index_communities_on_domain"
   add_index "communities", ["ident"], :name => "index_communities_on_ident"
 
+  create_table "communities_listings", :id => false, :force => true do |t|
+    t.integer "community_id"
+    t.integer "listing_id"
+  end
+
+  add_index "communities_listings", ["community_id"], :name => "index_communities_listings_on_community_id"
+  add_index "communities_listings", ["listing_id", "community_id"], :name => "communities_listings"
+
   create_table "community_customizations", :force => true do |t|
     t.integer  "community_id"
     t.string   "locale"
@@ -259,6 +267,16 @@ ActiveRecord::Schema.define(:version => 20151215071150) do
 
   add_index "community_memberships", ["community_id"], :name => "index_community_memberships_on_community_id"
   add_index "community_memberships", ["person_id", "community_id"], :name => "memberships"
+
+  create_table "community_plans", :force => true do |t|
+    t.integer  "community_id",                :null => false
+    t.integer  "plan_level",   :default => 0, :null => false
+    t.datetime "expires_at"
+    t.datetime "created_at",                  :null => false
+    t.datetime "updated_at",                  :null => false
+  end
+
+  add_index "community_plans", ["community_id"], :name => "index_community_plans_on_community_id"
 
   create_table "community_translations", :force => true do |t|
     t.integer  "community_id",                  :null => false
@@ -872,6 +890,7 @@ ActiveRecord::Schema.define(:version => 20151215071150) do
     t.boolean  "is_organization"
     t.string   "organization_name"
     t.boolean  "deleted",                                          :default => false
+    t.string   "paypal_account"
   end
 
   add_index "people", ["authentication_token"], :name => "index_people_on_authentication_token"
@@ -978,6 +997,9 @@ ActiveRecord::Schema.define(:version => 20151215071150) do
     t.string   "delivery_method",                   :limit => 31, :default => "none"
     t.integer  "shipping_price_cents"
     t.boolean  "deleted",                                         :default => false
+    t.text     "paypal_paykey"
+    t.boolean  "paypal_initiated"
+    t.string   "paypal_status"
   end
 
   add_index "transactions", ["community_id", "deleted"], :name => "transactions_on_cid_and_deleted"

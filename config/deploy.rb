@@ -43,7 +43,8 @@ namespace :deploy do
 
         execute "chown -R nobody /var/www/sharetribe/shared/public/assets"
         execute "chown -R nobody /var/www/sharetribe/shared/public/system"
-
+        execute "bundle exec rake assets:precompile RAILS_ENV=production"
+        execute "cd /var/www/sharetribe/current; bundle install"
         execute "cd /opt/nginx/sbin; ./nginx -s stop; ./nginx"    	
     end
   end

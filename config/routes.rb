@@ -5,7 +5,7 @@ Kassi::Application.routes.draw do
   end
 
   mount Mercury::Engine => '/'
-
+  
   # The priority is based upon order of creation:
   # first created -> highest priority.
 
@@ -35,7 +35,15 @@ Kassi::Application.routes.draw do
   match "/listings/new/:type" => "listings#new", :as => :new_request_without_locale # needed for some emails, where locale part is already set
   match "/change_locale" => "i18n#change_locale", :as => :change_locale
 
+  #Adaptive Payments
+  get '/paypal/pay' => 'paypal#pay'
+  get '/paypal/execute_payment' => 'paypal#execute_payment'
+  post '/paypal/ipn_notify' => 'paypal#ipn_notify'
+  post '/paypal/notify_payment' => 'paypal#notify_payment'
+  post '/paypal/notify_payment_local' => 'paypal#notify_payment_local'
+  get '/paypal/ipn_test' => 'paypal#ipn_test'
 
+  
   # Prettier link for admin panel
   namespace :admin do
     match '' => "communities#getting_started"
@@ -73,7 +81,8 @@ Kassi::Application.routes.draw do
 
     # All new transactions (in the future)
     match "/transactions/new" => "transactions#new", as: :new_transaction
-
+    match "/transactions/:transaction_id/paypal_initiated" => "transactions#paypal_initiated"
+    
     # preauthorize flow
     match "/listings/:listing_id/preauthorize" => "preauthorize_transactions#preauthorize", :as => :preauthorize_payment
     match "/listings/:listing_id/preauthorized" => "preauthorize_transactions#preauthorized", :as => :preauthorized_payment
