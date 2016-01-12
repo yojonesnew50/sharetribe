@@ -109,16 +109,16 @@ default: &default_settings
   mail_delivery_method: "smtp" 
 
   smtp_email_address: "smtp.gmail.com"
-  smtp_email_port: 587 
-  smtp_email_user_name: "warmshoppinggood@gmail.com"
+  smtp_email_port: "587"
+  smtp_email_user_name: "sharetribewarm@gmail.com"
   smtp_email_password: "()shift33ASK21!$a"
   smtp_email_domain: "gmail.com"
 
   # This will be the from field in the mails sent from Sharetribe
-  sharetribe_mail_from_address: "warmshoppinggood@gmail.com"
+  sharetribe_mail_from_address: "sharetribewarm@gmail.com"
 
   # The address where the notifications of feedbacks from Sharetribe UI are sent
-  feedback_mailer_recipients:  'warmshoppinggood@gmail.com'
+  feedback_mailer_recipients:  'sharetribewarm@gmail.com'
 
   grid_listings_limit: 24
   map_listings_limit: 150
