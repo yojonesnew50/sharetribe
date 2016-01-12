@@ -757,7 +757,14 @@ module ApplicationHelper
         :icon_class => icon_class("notification_settings"),
         :path => notifications_person_settings_path(person),
         :name => "notifications"
-      }
+      },
+      {
+        :id => "settings-tab-payments",
+        :text => t("layouts.settings.payments"),
+        :icon_class => icon_class("payment_settings"),
+        :path => payments_person_settings_path(person),
+        :name => "payments"
+      }      
     ]
 
     payment_type = MarketplaceService::Community::Query.payment_type(@current_community.id)

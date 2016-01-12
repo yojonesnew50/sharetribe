@@ -77,8 +77,11 @@ class PaypalController < ApplicationController
   end
 
   def connect
-    @current_user.update_attributes!(paypal_account: params[:paypal_account])
-    render json: "ok", status: 200
+    p " paypal account ==== #{params[:paypal_account]}" 
+    p " query ======> #{@current_user.update_attributes!(paypal_account: params[:paypal_account])}" 
+    
+    flash[:notice] = "PayPal account connected!"
+    redirect_to :back
   end
 
 end

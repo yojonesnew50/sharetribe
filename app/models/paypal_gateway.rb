@@ -16,8 +16,6 @@ class PaypalGateway
 
   def pay(amount, seller_paypal_account)
 
-    p "ACCOUNT ===== #{seller_paypal_account}"
-
 
     # Build request object
     @pay = @api.build_pay({
