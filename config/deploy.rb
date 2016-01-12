@@ -35,18 +35,16 @@ set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', '
 # set :keep_releases, 5
 
 namespace :deploy do
+on roles(:web), in: :groups, limit: 3, wait: 10 do
+    execute "cd /var/www/sharetribe; chown nobody -R current/"
+    execute "cd /var/www/sharetribe; chown nobody -R releases/"
 
-  after :restart, :clear_cache do
-    on roles(:web), in: :groups, limit: 3, wait: 10 do
-        execute "cd /var/www/sharetribe; chown nobody -R current/"
-        execute "cd /var/www/sharetribe; chown nobody -R releases/"
+    execute "chown -R nobody /var/www/sharetribe/shared/public/assets"
+    execute "chown -R nobody /var/www/sharetribe/shared/public/system"
 
-        execute "chown -R nobody /var/www/sharetribe/shared/public/assets"
-        execute "chown -R nobody /var/www/sharetribe/shared/public/system"
-        execute "bundle exec rake assets:precompile RAILS_ENV=production"
-        execute "cd /var/www/sharetribe/current; bundle install"
-        execute "cd /opt/nginx/sbin; ./nginx -s stop; ./nginx"    	
-    end
-  end
+    execute "bundle exec rake assets:precompile RAILS_ENV=production"
+    execute "cd /var/www/sharetribe/current; bundle install"
+    execute "cd /opt/nginx/sbin; ./nginx -s stop; ./nginx"    	
+end
 
 end
