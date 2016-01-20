@@ -942,4 +942,10 @@ module ApplicationHelper
       content_for :extra_javascript do js end
     end
   end
+
+  def get_paypal_button_label
+    return "Change your Paypal account" if not @current_user.paypal_account.blank?
+    return "Connect with Paypal"
+  end
+
 end

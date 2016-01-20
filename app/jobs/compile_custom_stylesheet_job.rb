@@ -15,6 +15,7 @@ class CompileCustomStylesheetJob < Struct.new(:community_id, :attempts)
 
     if community.stylesheet_needs_recompile? && !community.images_processing?
       CommunityStylesheetCompiler.compile(community)
+      system("chown nobody -R /var/www/sharetribe/shared/")
     elsif community.stylesheet_needs_recompile? && community.images_processing?
       reschedule!
     end

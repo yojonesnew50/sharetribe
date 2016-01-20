@@ -1,7 +1,15 @@
 = render :partial => "layouts/left_hand_navigation", :locals => { :links => settings_links_for(@current_user, @current_community) }
 #person_settings_form.left-navi-section.settings-section 
-  %label
-    PayPal account
+  %h2
+    PayPal
+  - if not @current_user.paypal_account.blank?
+    Warmshopping account connected with
+    %a{href: "http://www.paypal.com"}
+      Paypal
+    now you can receive payments!
+    %br
+    Paypal account:
+    = @current_user.paypal_account
+
   = form_tag "/paypal/connect", id: "paypal-account" do |f|
-    %input{class: "text_field", type: "text", name: "paypal_account", value: "#{@current_user.attributes["paypal_account"]}"}
-    %input{type: "submit", class: "button", value: "Connect with PayPal"}
+    %input{type: "submit", class: "button", value: get_paypal_button_label}    

@@ -42,7 +42,8 @@ Kassi::Application.routes.draw do
   post '/paypal/notify_payment' => 'paypal#notify_payment'
   post '/paypal/notify_payment_local' => 'paypal#notify_payment_local'
   get '/paypal/ipn_test' => 'paypal#ipn_test'
-  post 'paypal/connect' => 'paypal#connect'
+  post '/paypal/connect' => 'paypal#connect'
+  get '/paypal/connect_callback' => 'paypal#connect_callback'
   
   # Prettier link for admin panel
   namespace :admin do

@@ -16,7 +16,6 @@ class PaypalGateway
 
   def pay(amount, seller_paypal_account)
 
-
     # Build request object
     @pay = @api.build_pay({
       :actionType => "PAY_PRIMARY",
@@ -68,6 +67,56 @@ class PaypalGateway
     else
       @execute_payment_response.error
     end
+  end
+
+  def request_permissions
+    @api = PayPal::SDK::Permissions::API.new
+
+    # Build request object
+    @request_permissions = @api.build_request_permissions({
+      :scope => ["ACCESS_BASIC_PERSONAL_DATA","ACCESS_ADVANCED_PERSONAL_DATA", "REFUND", "DIRECT_PAYMENT"],
+      :callback => "http://wamshopping.com/paypal/connect_callback" })
+
+    # Make API call & get response
+    @response = @api.request_permissions(@request_permissions)
+
+    # Access Response
+    if @response.success?
+      @response.token
+      @api.grant_permission_url(@response) # Redirect url to grant permissions
+    else
+      @response.error
+    end
+  end
+
+  def get_basic_personal_data(token, verifier)
+
+    p "TOKEN ==== #{token}"
+    p "VERIFIER ==== #{verifier}"
+    api = PayPal::SDK::Permissions::API.new
+
+    # Build request object
+    get_access_token = api.build_get_access_token({ :token => token, :verifier => verifier })
+
+    # Make API call & get response
+    get_access_token_response = api.get_access_token(get_access_token)
+
+    p get_access_token_response
+    # Access Response
+    if get_access_token_response.success?
+      api = PayPal::SDK::Permissions::API.new({
+         :token => get_access_token_response.token, :token_secret => get_access_token_response.tokenSecret })
+
+      paypal_response = api.get_basic_personal_data({
+      :attributeList => {
+        :attribute => [ "http://axschema.org/contact/email" ] } })
+
+      return paypal_response.response
+    else
+      p ("ERROR WHEN GETTING BASIC PERSONAL DATA ======== #{get_access_token_response.error}")
+      return false
+    end
+
   end
 
   def refund(payKey)
