@@ -86,6 +86,7 @@ class PaypalController < ApplicationController
     paypal_personal_data = paypal_gateway.get_basic_personal_data(params[:request_token], params[:verification_code])
     paypal_account = paypal_personal_data.personalData[0].personalDataValue
     flash[:notice] = "Paypal Account Connected!"
+    
     @current_user.update_attributes(paypal_account: paypal_account)
 
     redirect_to "/"

@@ -4,6 +4,8 @@ lock '3.4.0'
 set :application, 'sharetribe'
 set :repo_url, 'https://github.com/yojonesnew50/sharetribe.git'
 
+set :use_sudo, true
+
 # Default branch is :master
 # ask :branch, `git rev-parse --abbrev-ref HEAD`.chomp
 
@@ -26,7 +28,8 @@ set :repo_url, 'https://github.com/yojonesnew50/sharetribe.git'
 #set :linked_files, fetch(:linked_files, []).push('config/database.yml', 'config/secrets.yml')
 
 # Default value for linked_dirs is []
-set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', 'tmp/sockets', 'vendor/bundle', 'public/system')
+set :linked_files, %w{config/database.yml}
+set :linked_dirs, %w{bin log tmp/pids tmp/cache tmp/sockets vendor/bundle public/system}
 
 # Default value for default_env is {}
 # set :default_env, { path: "/opt/ruby/bin:$PATH" }
@@ -35,16 +38,33 @@ set :linked_dirs, fetch(:linked_dirs, []).push('log', 'tmp/pids', 'tmp/cache', '
 # set :keep_releases, 5
 
 namespace :deploy do
-on roles(:web), in: :groups, limit: 3, wait: 10 do
-    execute "cd /var/www/sharetribe; chown nobody -R current/"
-    execute "cd /var/www/sharetribe; chown nobody -R releases/"
+  desc 'Restart application'
+  task :restart do
+    on roles(:app), in: :sequence, wait: 5 do
+      # Your restart mechanism here, for example:
+      execute :touch, release_path.join('restart.txt')
+    end
+  end
 
-    execute "chown -R nobody /var/www/sharetribe/shared/public/assets"
-    execute "chown -R nobody /var/www/sharetribe/shared/public/system"
+  after :restart, :clear_cache do
+    on roles(:web), in: :groups, limit: 3, wait: 10 do
+      # Here we can do anything such as:
+      within release_path do
 
-    execute "bundle exec rake assets:precompile RAILS_ENV=production"
-    execute "cd /var/www/sharetribe/current; bundle install"
-    execute "cd /opt/nginx/sbin; ./nginx -s stop; ./nginx"    	
+# cd /var/www/sharetribe/current; bundle exec rake assets:precompile RAILS_ENV=production
+# cd /var/www/sharetribe; chown nobody -R current/
+# cd /var/www/sharetribe; chown nobody -R releases/
+
+# chown -R nobody /var/www/sharetribe/shared/public/assets
+# chown -R nobody /var/www/sharetribe/shared/public/system
+
+# cd /opt/nginx/sbin; ./nginx -s stop; ./nginx
+
+
+        # execute "passenger-config restart-app /"
+      end
+    end
+  end
 end
 
-end
+after "deploy", "deploy:restart"
