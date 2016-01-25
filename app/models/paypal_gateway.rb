@@ -19,7 +19,7 @@ class PaypalGateway
     # Build request object
     @pay = @api.build_pay({
       :actionType => "PAY_PRIMARY",
-      :cancelUrl => "https://warmshopping.com",
+      :cancelUrl => "http://warmshopping.com",
       :currencyCode => "USD",
       :feesPayer => "PRIMARYRECEIVER",
       :ipnNotificationUrl => "https://warmshopping.com/paypal/ipn_notify?paykey=${paykey}",
@@ -36,7 +36,7 @@ class PaypalGateway
           }
         ]
       },
-      :returnUrl => "https://warmshopping.com" })
+      :returnUrl => "http://warmshopping.com" })
 
     # Make API call & get response
     @response = @api.pay(@pay)
