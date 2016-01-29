@@ -573,6 +573,10 @@ function initialize_signup_form(locale, username_in_use_message, invalid_usernam
     link.preventDefault();
     $('#terms').lightbox_me({ centered: true, zIndex: 1000000 });
   });
+  $('#privacy_policy_link').click(function(link) {
+    link.preventDefault();
+    $('#privacy_policy').lightbox_me({ centered: true, zIndex: 1000000 });
+  });  
   var form_id = "#new_person";
   //name_required = (name_required == 1) ? true : false
   $(form_id).validate({

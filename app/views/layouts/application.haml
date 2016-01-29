@@ -83,5 +83,5 @@
 
   :javascript
     $(document).ready(function() { initialize_defaults("#{I18n.locale}"); #{yield :javascript} });
-    if (window != top) { top.location.replace(document.location); }
+    //if (window != top) { top.location.replace(document.location); }
   = render :partial => "layouts/noscript"
