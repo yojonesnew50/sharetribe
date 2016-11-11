@@ -17,7 +17,7 @@ end
 
 gem 'sass-rails'
 gem 'compass-rails', '~> 1.1'
-gem 'therubyracer' 
+gem 'therubyracer'
 
 # Requiring 'compass' gem directly is not normally needed,
 # 'compass-rails' already does that.
@@ -75,7 +75,6 @@ gem 'money-rails'
 
 # The latest release (0.9.0) is not Rails 4 compatible
 gem 'mercury-rails'
-
 gem 'fb-channel-file'
 gem 'country_select', '~> 1.3.1'
 gem 'braintree'
@@ -93,6 +92,9 @@ gem 'jwt', '~> 1.5.1'
 gem 'lograge'
 gem 'public_suffix' # Needed currently to set GA hostname right, probably not
                     # needed anymore when GA script updated.
+
+gem 'foreman', '0.76.0'
+
 
 group :staging, :production do
   gem 'newrelic_rpm', '~> 3.9.1.236'
